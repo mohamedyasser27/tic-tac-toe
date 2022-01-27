@@ -12,17 +12,37 @@ html {
   margin: 0;
   padding: 0;
 }
-
+/* 
 @media (prefers-color-scheme: dark) {
   body {
     background-color: #1c1c1c;
     color: #e6e6e6;
   }
-}
+} */
 
 body {
   min-height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.gameBoardCellDisplay {
+  border: black 1px solid;
+  height: 6em;
+  width: 6em;
+}
+
+.GameBoardDisplay {
+  background-color: #fed563;
+  border: 9px black solid;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+}
+.GameBoardDisplay,
+.marker {
+  border-radius: 30px;
+}
+.marker {
+  width: 100%;
 }

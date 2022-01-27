@@ -115,25 +115,29 @@ let player1 = Player("ahmed", "x");
 let player2 = Player("mohamed", "o");
 let gameBoard = gameBoardCreator.getBoard();
 
-console.log(gameBoard);
-
-console.log(gameController.checkWin(gameBoard));
-
 let win = false;
-let turn = 1;
-console.log(player1.marker);
-console.log(player2.marker);
 
-while (!win) {
-  if (turn % 2 == 0) {
-    player1.play(gameBoard);
-  } else {
-    player2.play(gameBoard);
-  }
-
-  if (gameController.checkWin(gameBoard)) {
-    win = true;
-    console.log("won");
-  }
-  turn++;
+function loadElementsIntoArray(elementSelector) {
+  return Array.from(document.querySelectorAll(elementSelector));
 }
+
+let gaemBoardCells = loadElementsIntoArray(".gameBoardCellDisplay");
+let turn = 1;
+gaemBoardCells.forEach((cell) => {
+  cell.addEventListener("click", (event) => {
+    let image = document.createElement("img");
+    event.target.append(image);
+    turn % 2 == 0
+      ? (image.src = "./assets/x.jpg")
+      : (image.src = "./assets/o.jpg");
+    image.classList.add("marker");
+    cell.classList.add("clicked");
+    if (gameController.checkWin(gameBoard)) {
+      win = true;
+      console.log("won");
+    }
+    turn++;
+  });
+});
+let OMarker = "./assets/o.jpg";
+let XMarker = "./assets/x.jpg";
