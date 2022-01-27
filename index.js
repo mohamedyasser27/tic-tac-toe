@@ -1,14 +1,19 @@
-const playerActions = {
-  play: function (gameBoard) {
-    //xCoordinate, yCoordinate, gameBoard
-    let = xCoordinate = window.prompt("x?");
-    let = yCoordinate = window.prompt("y?");
+/*==========================================
+Helper Functions
+*/
+function loadElementsIntoArray(elementSelector) {
+  return Array.from(document.querySelectorAll(elementSelector));
+}
+//==========================================
 
+const playerActions = {
+  play: function (xCoordinate, yCoordinate, gameBoard) {
     if (!gameBoard[xCoordinate][yCoordinate]) {
       gameBoard[xCoordinate][yCoordinate] = this.marker;
     }
   },
 };
+
 function Player(name, marker) {
   let returnedPlayer = { name, marker };
   Object.assign(returnedPlayer, playerActions);
@@ -16,27 +21,29 @@ function Player(name, marker) {
 }
 
 let gameBoardCreator = (function () {
-  let boardSize = 3;
-  let board = [];
-  for (let i = 0; i < boardSize; i++) {
+  let gameBoardSize = 3;
+  let gameBoard = [];
+  for (let i = 0; i < gameBoardSize; i++) {
     let newRow = [];
-    for (let j = 0; j < boardSize; j++) {
+    for (let j = 0; j < gameBoardSize; j++) {
       newRow[j] = "";
     }
-    board[i] = newRow;
+    gameBoard[i] = newRow;
   }
-  function getBoard() {
-    return board;
+
+  function getGameBoard() {
+    return gameBoard;
   }
+
   return {
-    getBoard,
+    getGameBoard,
   };
 })();
-let gameController = (function () {
-  function checkWinOnAxis(gameBoard) {
-    let boardSize = gameBoard.length;
 
-    for (let row = 0; row < boardSize; row++) {
+let gameController = (function () {
+  function checkWinOnRows(gameBoard) {
+    let gameboardSize = gameBoard.length;
+    for (let row = 0; row < gameboardSize; row++) {
       if (gameBoard[row].includes("")) {
         continue;
       }
@@ -47,20 +54,15 @@ let gameController = (function () {
         return true;
       }
     }
-    let transposedgameBoard = TransposeGameBoard(gameBoard);
+  }
 
-    for (let row = 0; row < boardSize; row++) {
-      if (transposedgameBoard[row].includes("")) {
-        continue;
-      }
-      if (
-        transposedgameBoard[row][0] == transposedgameBoard[row][1] &&
-        transposedgameBoard[row][0] == transposedgameBoard[row][2]
-      ) {
-        return true;
-      }
+  function checkWinOnAxis(gameBoard) {
+    let transposedgameBoard = TransposeGameBoard(gameBoard); //make columns rows
+
+    if (checkWinOnRows(gameBoard) || checkWinOnRows(transposedgameBoard)) {
+      //check both rows(normal Board) and columns (transposed board)
+      return true;
     }
-
     return false;
   }
 
@@ -106,6 +108,7 @@ let gameController = (function () {
     }
     return false;
   }
+
   return {
     checkWin,
   };
@@ -113,31 +116,41 @@ let gameController = (function () {
 
 let player1 = Player("ahmed", "x");
 let player2 = Player("mohamed", "o");
-let gameBoard = gameBoardCreator.getBoard();
+
+let XMarker = "./assets/x.jpg";
+let OMarker = "./assets/o.jpg";
+
+let gameBoard = gameBoardCreator.getGameBoard();
 
 let win = false;
-
-function loadElementsIntoArray(elementSelector) {
-  return Array.from(document.querySelectorAll(elementSelector));
-}
-
-let gaemBoardCells = loadElementsIntoArray(".gameBoardCellDisplay");
 let turn = 1;
-gaemBoardCells.forEach((cell) => {
+
+let gameBoardCells = loadElementsIntoArray(".GameBoardCellDisplay");
+gameBoardCells.forEach((cell) => {
   cell.addEventListener("click", (event) => {
-    let image = document.createElement("img");
-    event.target.append(image);
-    turn % 2 == 0
-      ? (image.src = "./assets/x.jpg")
-      : (image.src = "./assets/o.jpg");
-    image.classList.add("marker");
-    cell.classList.add("clicked");
-    if (gameController.checkWin(gameBoard)) {
-      win = true;
-      console.log("won");
+    if (!win) {
+      console.log(gameBoard);
+      let image = document.createElement("img");
+      event.target.append(image);
+      [cellXCoordinate, cellYCoordinate] = [
+        Number.parseInt(cell.classList[1][4]),
+        Number.parseInt(cell.classList[1][5]),
+      ];
+      if (turn % 2 == 0) {
+        image.src = "./assets/o.jpg";
+        player2.play(cellXCoordinate, cellYCoordinate, gameBoard);
+      } else {
+        player1.play(cellXCoordinate, cellYCoordinate, gameBoard);
+
+        image.src = "./assets/x.jpg";
+      }
+      image.classList.add("Marker");
+      if (gameController.checkWin(gameBoard)) {
+        win = true;
+        console.log("won");
+      }
+
+      turn++;
     }
-    turn++;
   });
 });
-let OMarker = "./assets/o.jpg";
-let XMarker = "./assets/x.jpg";

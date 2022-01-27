@@ -27,7 +27,7 @@ body {
   align-items: center;
 }
 
-.gameBoardCellDisplay {
+.GameBoardCellDisplay {
   border: black 1px solid;
   height: 6em;
   width: 6em;
@@ -40,9 +40,9 @@ body {
   grid-template-columns: repeat(3, 1fr);
 }
 .GameBoardDisplay,
-.marker {
+.Marker {
   border-radius: 30px;
 }
-.marker {
+.Marker {
   width: 100%;
 }
