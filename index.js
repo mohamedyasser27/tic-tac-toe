@@ -133,9 +133,6 @@ let gameController = (function () {
 let player1 = Player("player 1", "x");
 let player2 = Player("player 2", "o");
 
-let XMarkerPath = "./assets/x.jpg";
-let OMarkerPath = "./assets/o.jpg";
-
 let gameBoard = gameBoardCreator.getGameBoard();
 
 let winOrDraw = false;
@@ -152,8 +149,11 @@ reloadButton.addEventListener("click", () => {
 });
 gameBoardCells.forEach((cell) => {
   cell.addEventListener("click", (event) => {
-    if (!winOrDraw) {
+    console.log(turnsLeft);
+    if (!event.target.classList.contains("Marker")) {
       turnsLeft--;
+    }
+    if (!winOrDraw) {
       let image = document.createElement("img");
       event.target.append(image);
       [cellXCoordinate, cellYCoordinate] = [
@@ -161,12 +161,12 @@ gameBoardCells.forEach((cell) => {
         Number.parseInt(cell.classList[1][5]),
       ];
       if (RoundNumber % 2 != 0) {
-        image.src = XMarkerPath;
+        image.src = "./assets/x.jpg";
         player1.play(cellXCoordinate, cellYCoordinate, gameBoard);
         gameController.checkWin(gameBoard, turnsLeft, player1.name);
         CurrentPlayer.textContent = `${player2.name} turn`;
       } else {
-        image.src = OMarkerPath;
+        image.src = "./assets/o.jpg";
         player2.play(cellXCoordinate, cellYCoordinate, gameBoard);
         gameController.checkWin(gameBoard, turnsLeft, player2.name);
         CurrentPlayer.textContent = `${player1.name} turn`;
