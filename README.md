@@ -20,8 +20,7 @@ This is a project i built for the odin project foundation path.
 
 ## Future Goals
 
-- [ ]
-- [ ]
+- [ ] add AI to the project
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -31,7 +30,7 @@ This is a project i built for the odin project foundation path.
 
 Your Name - [muhammed_Y272](https://twitter.com/muhammed_Y272)
 
-Project Link: [tic-tac-toe](google.com)
+Project Link: [tic-tac-toe](https://mohamedyasser27.github.io/tic-tac-toe/)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 

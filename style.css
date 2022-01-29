@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Mochiy+Pop+P+One&display=swap");
+
 html {
   box-sizing: border-box;
 }
@@ -21,21 +23,35 @@ html {
 } */
 
 body {
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
   align-items: center;
+  background-color: #232946;
+  display: flex;
+  font-family: "Mochiy Pop P One", sans-serif;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 100vh;
+}
+
+.CurrentPlayer {
+  color: #fffffe;
+  font-size: 32px;
+  margin-bottom: 2%;
+}
+
+.dim {
+  box-shadow: 0 0 0 3000px rgba(0, 0, 0, 0.4);
 }
 
 .GameBoardCellDisplay {
   border: black 1px solid;
-  height: 6em;
-  width: 6em;
+  height: 8em;
+  width: 8em;
 }
 
 .GameBoardDisplay {
   background-color: #fed563;
   border: 9px black solid;
+  cursor: pointer;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
 }
@@ -43,6 +59,35 @@ body {
 .Marker {
   border-radius: 30px;
 }
+
 .Marker {
   width: 100%;
+}
+
+.ReloadBtn {
+  background-color: #fc3160;
+  border: 3px black solid;
+  border-radius: 10px;
+  cursor: pointer;
+  margin-top: 1em;
+  padding: 1em 3em;
+}
+
+.ResultDisplay {
+  align-items: center;
+  background-color: #fed563;
+  border: black 3px solid;
+  border-radius: 20px;
+  color: black;
+  display: flex;
+  flex-direction: column;
+  height: 12em;
+  justify-content: center;
+  position: absolute;
+  width: 27em;
+  z-index: 2;
+}
+
+.invisible {
+  display: none;
 }

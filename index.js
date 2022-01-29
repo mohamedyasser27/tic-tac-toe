@@ -41,6 +41,8 @@ let gameBoardCreator = (function () {
 })();
 
 let gameController = (function () {
+  let ResultDisplay = document.querySelector(".ResultDisplay");
+
   function checkWinOnRows(gameBoard) {
     let gameboardSize = gameBoard.length;
     for (let row = 0; row < gameboardSize; row++) {
@@ -102,11 +104,25 @@ let gameController = (function () {
     return transposedgameBoard;
   }
 
-  function checkWin(gameBoard) {
+  function checkWin(gameBoard, turnsLeft, playerName) {
     if (checkWinOnDiagonal(gameBoard) || checkWinOnAxis(gameBoard)) {
-      return true;
+      DisplayResult(true, turnsLeft, playerName);
+    } else if (turnsLeft == 0) {
+      DisplayResult(false, turnsLeft, playerName);
     }
-    return false;
+  }
+
+  function DisplayResult(winOrDraw, turnsLeft, playerName) {
+    if (winOrDraw) {
+      winOrDraw = true;
+      ResultDisplay.children[0].textContent = `Congrtulations , ${playerName} won!!`;
+      ResultDisplay.classList.remove("invisible");
+      ResultDisplay.classList.add("dim");
+    } else if (turnsLeft == 0) {
+      ResultDisplay.children[0].textContent = "it's A Draw!!!";
+      ResultDisplay.classList.remove("invisible");
+      ResultDisplay.classList.add("dim");
+    }
   }
 
   return {
@@ -114,43 +130,50 @@ let gameController = (function () {
   };
 })();
 
-let player1 = Player("ahmed", "x");
-let player2 = Player("mohamed", "o");
+let player1 = Player("player 1", "x");
+let player2 = Player("player 2", "o");
 
-let XMarker = "./assets/x.jpg";
-let OMarker = "./assets/o.jpg";
+let XMarkerPath = "./assets/x.jpg";
+let OMarkerPath = "./assets/o.jpg";
 
 let gameBoard = gameBoardCreator.getGameBoard();
 
-let win = false;
-let turn = 1;
+let winOrDraw = false;
+let RoundNumber = 1;
+let turnsLeft = gameBoard.length * 3;
 
+let CurrentPlayer = document.querySelector(".CurrentPlayer");
+CurrentPlayer.textContent = `${player1.name} turn`;
 let gameBoardCells = loadElementsIntoArray(".GameBoardCellDisplay");
+let reloadButton = document.querySelector(".ReloadBtn");
+
+reloadButton.addEventListener("click", () => {
+  location.reload();
+});
 gameBoardCells.forEach((cell) => {
   cell.addEventListener("click", (event) => {
-    if (!win) {
-      console.log(gameBoard);
+    if (!winOrDraw) {
+      turnsLeft--;
       let image = document.createElement("img");
       event.target.append(image);
       [cellXCoordinate, cellYCoordinate] = [
-        Number.parseInt(cell.classList[1][4]),
+        Number.parseInt(cell.classList[1][4]), //Cell 00 (0,0),Cell 00 (0,1)
         Number.parseInt(cell.classList[1][5]),
       ];
-      if (turn % 2 == 0) {
-        image.src = "./assets/o.jpg";
-        player2.play(cellXCoordinate, cellYCoordinate, gameBoard);
-      } else {
+      if (RoundNumber % 2 != 0) {
+        image.src = XMarkerPath;
         player1.play(cellXCoordinate, cellYCoordinate, gameBoard);
-
-        image.src = "./assets/x.jpg";
+        gameController.checkWin(gameBoard, turnsLeft, player1.name);
+        CurrentPlayer.textContent = `${player2.name} turn`;
+      } else {
+        image.src = OMarkerPath;
+        player2.play(cellXCoordinate, cellYCoordinate, gameBoard);
+        gameController.checkWin(gameBoard, turnsLeft, player2.name);
+        CurrentPlayer.textContent = `${player1.name} turn`;
       }
       image.classList.add("Marker");
-      if (gameController.checkWin(gameBoard)) {
-        win = true;
-        console.log("won");
-      }
 
-      turn++;
+      RoundNumber++;
     }
   });
 });
