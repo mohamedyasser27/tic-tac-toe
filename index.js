@@ -14,11 +14,17 @@ const playerActions = {
   },
 };
 
-function Player(name, marker) {
+function Player(name, markerName) {
+  let marker = document.createElement("img");
+  marker.src = `./assets/${markerName}.jpg`;
+  marker.classList.add("Marker");
   let returnedPlayer = { name, marker };
   Object.assign(returnedPlayer, playerActions);
   return returnedPlayer;
 }
+
+let player1 = Player("player 1", "x");
+let player2 = Player("player 2", "o");
 
 let gameBoardCreator = (function () {
   let gameBoardSize = 3;
@@ -39,11 +45,15 @@ let gameBoardCreator = (function () {
     getGameBoard,
   };
 })();
-
 let gameController = (function () {
+  let roundNumber = 1;
+  let winOrDraw = false;
+  let turnsLeft = 9;
+  let currentMarker = player1.marker.cloneNode(true);
+
   let ResultDisplay = document.querySelector(".ResultDisplay");
 
-  function checkWinOnRows(gameBoard) {
+  function checkWinOrDrawOnRows(gameBoard) {
     let gameboardSize = gameBoard.length;
     for (let row = 0; row < gameboardSize; row++) {
       if (gameBoard[row].includes("")) {
@@ -58,17 +68,20 @@ let gameController = (function () {
     }
   }
 
-  function checkWinOnAxis(gameBoard) {
+  function checkWinOrDrawOnAxis(gameBoard) {
     let transposedgameBoard = TransposeGameBoard(gameBoard); //make columns rows
 
-    if (checkWinOnRows(gameBoard) || checkWinOnRows(transposedgameBoard)) {
+    if (
+      checkWinOrDrawOnRows(gameBoard) ||
+      checkWinOrDrawOnRows(transposedgameBoard)
+    ) {
       //check both rows(normal Board) and columns (transposed board)
       return true;
     }
     return false;
   }
 
-  function checkWinOnDiagonal(gameBoard) {
+  function checkWinOrDrawOnDiagonal(gameBoard) {
     if (gameBoard[1][1] == "") {
       return false;
     }
@@ -104,15 +117,23 @@ let gameController = (function () {
     return transposedgameBoard;
   }
 
-  function checkWin(gameBoard, turnsLeft, playerName) {
-    if (checkWinOnDiagonal(gameBoard) || checkWinOnAxis(gameBoard)) {
-      DisplayResult(true, turnsLeft, playerName);
+  function checkWinOrDraw(gameBoard, playerName) {
+    turnsLeft--;
+    if (
+      checkWinOrDrawOnDiagonal(gameBoard) ||
+      checkWinOrDrawOnAxis(gameBoard)
+    ) {
+      DisplayResult(true, playerName);
     } else if (turnsLeft == 0) {
-      DisplayResult(false, turnsLeft, playerName);
+      DisplayResult(false, playerName);
     }
   }
 
-  function DisplayResult(winOrDraw, turnsLeft, playerName) {
+  function switchPlayer(player) {
+    CurrentPlayerNameDisplay.textContent = `${player.name} turn`;
+    gameController.currentMarker = player.marker.cloneNode(true);
+  }
+  function DisplayResult(winOrDraw, playerName) {
     if (winOrDraw) {
       winOrDraw = true;
       ResultDisplay.children[0].textContent = `Congrtulations , ${playerName} won!!`;
@@ -126,54 +147,47 @@ let gameController = (function () {
   }
 
   return {
-    checkWin,
+    checkWinOrDraw,
+    switchPlayer,
+    roundNumber,
+    winOrDraw,
+    currentMarker,
   };
 })();
 
-let player1 = Player("player 1", "x");
-let player2 = Player("player 2", "o");
-
 let gameBoard = gameBoardCreator.getGameBoard();
 
-let winOrDraw = false;
-let RoundNumber = 1;
-let turnsLeft = gameBoard.length * 3;
+let CurrentPlayerNameDisplay = document.querySelector(".CurrentPlayer");
+CurrentPlayerNameDisplay.textContent = `${player1.name} turn`;
 
-let CurrentPlayer = document.querySelector(".CurrentPlayer");
-CurrentPlayer.textContent = `${player1.name} turn`;
-let gameBoardCells = loadElementsIntoArray(".GameBoardCellDisplay");
 let reloadButton = document.querySelector(".ReloadBtn");
-
 reloadButton.addEventListener("click", () => {
   location.reload();
 });
+
+let gameBoardCells = loadElementsIntoArray(".GameBoardCellDisplay");
 gameBoardCells.forEach((cell) => {
   cell.addEventListener("click", (event) => {
-    console.log(turnsLeft);
-    if (!event.target.classList.contains("Marker")) {
-      turnsLeft--;
-    }
-    if (!winOrDraw) {
-      let image = document.createElement("img");
-      event.target.append(image);
+    if (
+      !event.target.classList.contains("Marker") &&
+      !gameController.winOrDraw
+    ) {
       [cellXCoordinate, cellYCoordinate] = [
         Number.parseInt(cell.classList[1][4]), //Cell 00 (0,0),Cell 00 (0,1)
         Number.parseInt(cell.classList[1][5]),
       ];
-      if (RoundNumber % 2 != 0) {
-        image.src = "./assets/x.jpg";
+      if (gameController.roundNumber % 2 != 0) {
+        event.target.append(gameController.currentMarker);
         player1.play(cellXCoordinate, cellYCoordinate, gameBoard);
-        gameController.checkWin(gameBoard, turnsLeft, player1.name);
-        CurrentPlayer.textContent = `${player2.name} turn`;
+        gameController.checkWinOrDraw(gameBoard, player1.name);
+        gameController.switchPlayer(player2);
       } else {
-        image.src = "./assets/o.jpg";
+        event.target.append(gameController.currentMarker);
         player2.play(cellXCoordinate, cellYCoordinate, gameBoard);
-        gameController.checkWin(gameBoard, turnsLeft, player2.name);
-        CurrentPlayer.textContent = `${player1.name} turn`;
+        gameController.checkWinOrDraw(gameBoard, player2.name);
+        gameController.switchPlayer(player1);
       }
-      image.classList.add("Marker");
-
-      RoundNumber++;
+      gameController.roundNumber++;
     }
   });
 });
